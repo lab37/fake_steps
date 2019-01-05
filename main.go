@@ -43,6 +43,10 @@ func getBdAddr(dev gatt.Device) {
 
 func main() {
 	flag.Parse()
+	if *dstSteps > 100000 {
+		fmt.Println("步数不能大于10万步！")
+		return
+	}
 	// （小端模式）字节序低位优先
 	// 01(数据类型为步数)         10 27 00(0x015b38 = 88888)
 	//stepsInfo := []byte{0x01, 0x38, 0x5b, 0x01}
