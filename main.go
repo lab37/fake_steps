@@ -53,14 +53,14 @@ func main() {
 	)
 
 	const (
-		wxServiceUuid = 0xFEE7 // 微信服务标志0xFEE7
+		wxServiceUUID = 0xFEE7 // 微信服务标志0xFEE7
 
-		wxChWriteUuid    = 0xFEC7 // 微信服务写特征值
-		wxChIndicateUuid = 0xFEC8 // 微信的标志字符
-		wxChReadUuid     = 0xFEC9 // 微信读特征值
+		wxChWriteUUID    = 0xFEC7 // 微信服务写特征值
+		wxChIndicateUUID = 0xFEC8 // 微信的标志字符
+		wxChReadUUID     = 0xFEC9 // 微信读特征值
 
-		wxChPedometerUuid = 0xFEA1 // 微信计步器特征值
-		wxChTargetUuid    = 0xFEA2 // 微信目标特征值
+		wxChPedometerUUID = 0xFEA1 // 微信计步器特征值
+		wxChTargetUUID    = 0xFEA2 // 微信目标特征值
 	)
 
 	//生成设备
@@ -83,10 +83,10 @@ func main() {
 			getBdAddr(dev)
 
 			//获取服务
-			s0 := gatt.NewService(gatt.UUID16(wxServiceUuid))
+			s0 := gatt.NewService(gatt.UUID16(wxServiceUUID))
 
 			//添加计步器特征值
-			c0 := s0.AddCharacteristic(gatt.UUID16(wxChPedometerUuid))
+			c0 := s0.AddCharacteristic(gatt.UUID16(wxChPedometerUUID))
 			c0.HandleReadFunc(
 				func(rsp gatt.ResponseWriter, req *gatt.ReadRequest) {
 					log.Println("读取: 计步器特性值")
@@ -101,7 +101,7 @@ func main() {
 				})
 
 			// 添加目标特征值
-			c1 := s0.AddCharacteristic(gatt.UUID16(wxChTargetUuid))
+			c1 := s0.AddCharacteristic(gatt.UUID16(wxChTargetUUID))
 			c1.HandleReadFunc(
 				func(rsp gatt.ResponseWriter, req *gatt.ReadRequest) {
 					log.Println("读取: 目标特征值")
@@ -121,7 +121,7 @@ func main() {
 				})
 
 			// 添加读特征值
-			c2 := s0.AddCharacteristic(gatt.UUID16(wxChReadUuid))
+			c2 := s0.AddCharacteristic(gatt.UUID16(wxChReadUUID))
 			c2.HandleReadFunc(
 				func(rsp gatt.ResponseWriter, req *gatt.ReadRequest) {
 					log.Println("读取: 读特征值")
@@ -129,7 +129,7 @@ func main() {
 				})
 
 			// 添加服务
-			d.AddService(s0)
+			dev.AddService(s0)
 
 			// 广播设备名和服务的UUID
 			a := &gatt.AdvPacket{}
@@ -140,7 +140,7 @@ func main() {
 			// company id 和 data, MAC 地址
 			// https://www.bluetooth.com/specifications/assigned-numbers/company-identifiers
 			a.AppendManufacturerData(0x2333, mac[:])
-			d.Advertise(a)
+			dev.Advertise(a)
 
 		default:
 		}
@@ -149,3 +149,5 @@ func main() {
 	dev.Init(onStateChanged)
 	select {}
 }
+
+//http://www.wowotech.net/bluetooth/weixin_ble_1.html
