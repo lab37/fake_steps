@@ -2,6 +2,8 @@ package main
 
 import (
 	"bytes"
+	"encoding/binary"
+	"flag"
 	"fmt"
 	"log"
 
@@ -10,6 +12,7 @@ import (
 )
 
 var mac [6]byte
+var dstSteps = flag.Uint("s", 66666, "你要刷的步数")
 
 //cmdReadBDAddr实现了一个用于演示LnxSendHCIRawCommand()的cmd.CmdParam
 type cmdReadBDAddr struct{}
@@ -39,10 +42,14 @@ func getBdAddr(dev gatt.Device) {
 }
 
 func main() {
-
+	flag.Parse()
 	// （小端模式）字节序低位优先
 	// 01(数据类型为步数)         10 27 00(0x015b38 = 88888)
-	steps := []byte{0x01, 0x38, 0x5b, 0x01}
+	//stepsInfo := []byte{0x01, 0x38, 0x5b, 0x01}
+	buf := make([]byte, 4)
+	binary.LittleEndian.PutUint32(buf, uint32(*dstSteps))
+	stepsInfo := []byte{0x01}
+	stepsInfo = append(stepsInfo, buf[:3]...)
 
 	const (
 		flagLimitedDiscoverable = 0x01 // 限制性可发现模式
@@ -90,12 +97,12 @@ func main() {
 			c0.HandleReadFunc(
 				func(rsp gatt.ResponseWriter, req *gatt.ReadRequest) {
 					log.Println("读取: 计步器特性值")
-					rsp.Write(steps)
+					rsp.Write(stepsInfo)
 				})
 			c0.HandleNotifyFunc(
 				func(r gatt.Request, n gatt.Notifier) {
 					go func() {
-						n.Write(steps)
+						n.Write(stepsInfo)
 						log.Printf("告知: 计步器特性值")
 					}()
 				})
@@ -105,12 +112,12 @@ func main() {
 			c1.HandleReadFunc(
 				func(rsp gatt.ResponseWriter, req *gatt.ReadRequest) {
 					log.Println("读取: 目标特征值")
-					rsp.Write(steps)
+					rsp.Write(stepsInfo)
 				})
 			c1.HandleNotifyFunc(
 				func(r gatt.Request, n gatt.Notifier) {
 					go func() {
-						n.Write(steps)
+						n.Write(stepsInfo)
 						log.Printf("告知: 目标特征值")
 					}()
 				})
